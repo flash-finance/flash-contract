@@ -185,7 +185,7 @@ library SafeERC20 {
     }
 }
 
-contract Token is ERC20, ERC20Detailed {
+contract Sun is ERC20, ERC20Detailed {
     using SafeERC20 for IERC20;
     using Address for address;
     using SafeMath for uint;
@@ -194,7 +194,7 @@ contract Token is ERC20, ERC20Detailed {
     address public governance;
     mapping (address => bool) public minters;
 
-    constructor () public ERC20Detailed("USDT Token", "USDT", 6) {
+    constructor () public ERC20Detailed("Sun Token", "SUN", 6) {
         governance = msg.sender;
     }
 
