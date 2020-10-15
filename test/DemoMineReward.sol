@@ -25,9 +25,9 @@ contract IRewardDistributionRecipient is Ownable {
 
 contract TokenWrapper {
     using SafeMath for uint256;
-    using SafeERC20 for IERC20;
-    // USDT Token地址 TSf6JdJnMNcZk9BUZERk3hGSTfptdjDf9P
-    IERC20 public y = IERC20(0x41B70D0F801D0C8643029DD19AC6AD6DB6814C7F55);
+    using SafeTRC20 for ITRC20;
+    // Demo Token地址 TCFCgSewGo1wGdfu5QqFeUz6mzXtJzUjXW nile test network
+    ITRC20 public y = ITRC20(0x4118F6A3977034569ED6E38B377EF709EA3FEF68C5);
 
     uint256 private _totalSupply;
     mapping(address => uint256) private _balances;
@@ -53,13 +53,13 @@ contract TokenWrapper {
     }
 }
 
-contract USDTMineReward is TokenWrapper, IRewardDistributionRecipient {
-    // SUN Token地址 TC9pGMAWLdJK5PDxCCy1uQipL52smzHMvL
-    IERC20 public token = IERC20(0x4117F1D90730B2C248491F71515B8BE192E31E481A);
+contract DemoMineReward is TokenWrapper, IRewardDistributionRecipient {
+    // Demo Token地址 TCFCgSewGo1wGdfu5QqFeUz6mzXtJzUjXW nile test network
+    ITRC20 public token = ITRC20(0x4118F6A3977034569ED6E38B377EF709EA3FEF68C5);
     uint256 public constant DURATION = 5 days;
 
     uint256 public initreward = 5000*1e6;
-    uint256 public starttime = 1602225530; // 2020/10/9 14:38:50
+    uint256 public starttime = 1602748964; // 2020-10-15 16:02:44
     uint256 public periodFinish = 0;
     uint256 public rewardRate = 0;
     uint256 public lastUpdateTime;
