@@ -26,8 +26,8 @@ contract IRewardDistributionRecipient is Ownable {
 contract TokenWrapper {
     using SafeMath for uint256;
     using SafeTRC20 for ITRC20;
-    // Demo Token地址 TCFCgSewGo1wGdfu5QqFeUz6mzXtJzUjXW nile test network
-    ITRC20 public y = ITRC20(0x4118F6A3977034569ED6E38B377EF709EA3FEF68C5);
+    // Moon Token地址 TCgQ1Q1acP44itR3XP27gKk6uk3sNUmB6U nile test network
+    ITRC20 public y = ITRC20(0x411DBA7E4311F7A0F77FB37AEF4027C43C309EC3D7);
 
     uint256 private _totalSupply;
     mapping(address => uint256) private _balances;
@@ -56,7 +56,7 @@ contract TokenWrapper {
 contract DemoMineReward is TokenWrapper, IRewardDistributionRecipient {
     // Demo Token地址 TCFCgSewGo1wGdfu5QqFeUz6mzXtJzUjXW nile test network
     ITRC20 public token = ITRC20(0x4118F6A3977034569ED6E38B377EF709EA3FEF68C5);
-    uint256 public constant DURATION = 5 days;
+    uint256 public constant DURATION = 10 days;
 
     uint256 public initreward = 5000*1e6;
     uint256 public starttime = 1602748964; // 2020-10-15 16:02:44
