@@ -109,6 +109,8 @@ contract Ownable is Context {
 
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
+    bool public paused = false;
+
     constructor () internal {
         _owner = _msgSender();
         emit OwnershipTransferred(address(0), _owner);
@@ -140,6 +142,24 @@ contract Ownable is Context {
         require(newOwner != address(0), "Ownable: new owner is the zero address");
         emit OwnershipTransferred(_owner, newOwner);
         _owner = newOwner;
+    }
+
+    modifier whenNotPaused() {
+        require(!paused, "the contract had paused");
+        _;
+    }
+
+    modifier whenPaused {
+        require(paused, "the contract is working");
+        _;
+    }
+
+    function pause() external onlyOperate whenNotPaused {
+        paused = true;
+    }
+
+    function unPause() external onlyOperate whenPaused {
+        paused = false;
     }
 }
 
