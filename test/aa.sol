@@ -26,7 +26,7 @@ interface ITokenSwap {
 
 contract TokenSwap is Ownable, ReentrancyGuard {
     using SafeMath for uint256;
-    using SafeTRC20 for ITRC20;
+    using TransferHelper for address;
 
     ITRC20 public swapToken;
     ITokenSwap public lpToken;
@@ -72,11 +72,11 @@ contract TokenSwap is Ownable, ReentrancyGuard {
     function tokenToTrxSwap(uint256 tokens_sold, uint256 min_trx, address payable userAddress) public  returns (uint256) {
 
         require(!paused, "the contract had been paused");
-        swapToken.safeTransfer(address(this), tokens_sold);
+        require(address(swapToken).safeTransfer(address(this), tokens_sold), "safeTransfer error");
 
         uint256 _value = swapToken.allowance(address(this), address(lpToken));
         if (_value < tokens_sold) {
-            wapToken.safeApprove(address(lpToken), uint256(-1));
+            require(address(swapToken).safeApprove(address(lpToken), uint256(-1)), "safeApprove error");
         }
 
         return tokenToTrx(tokens_sold, min_trx, userAddress);
@@ -104,11 +104,11 @@ contract TokenSwap is Ownable, ReentrancyGuard {
     function tokenToTokenSwap(uint256 tokens_sold, uint256 min_tokens_bought, uint256 min_trx_bought, address userAddress, address token_addr) public returns (uint256) {
 
         require(!paused, "the contract had been paused");
-        swapToken.safeTransfer(address(this), tokens_sold);
+        require(address(swapToken).safeTransfer(address(this), tokens_sold), "safeTransfer error");
 
         uint256 _value = swapToken.allowance(address(this), address(lpToken));
         if (_value < tokens_sold) {
-            swapToken.safeApprove(address(lpToken), uint256(- 1));
+            require(address(swapToken).safeApprove(address(lpToken), uint256(- 1)), "safeApprove error");
         }
 
         return tokenToToken(tokens_sold, min_tokens_bought, min_trx_bought, userAddress, token_addr);
@@ -124,10 +124,10 @@ contract TokenSwap is Ownable, ReentrancyGuard {
         uint256 _a = _value.mul(tradingFee).div(10000);
         uint _b = _value.sub(_a);
         if (_b > 0) {
-            ITRC20(token_addr).safeTransfer(userAddress, _b);
+            require(address(ITRC20(token_addr)).safeTransfer(userAddress, _b), "tokenAddress safeTransfer error");
         }
         if (_a > 0) {
-            ITRC20(token_addr).safeTransfer(finance, _a);
+            require(address(ITRC20(token_addr)).safeTransfer(finance, _a), "tokenAddress safeTransfer error");
         }
 
         return _b;
