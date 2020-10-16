@@ -44,7 +44,7 @@ contract TokenSwap is Ownable, ReentrancyGuard {
         paused = false;
     }
 
-    constructor (address _swapTokenAddress, address _lpTokenAddress) internal {
+    constructor (address _swapTokenAddress, address _lpTokenAddress) public {
         swapTokenAddress = _swapTokenAddress;
         lpTokenAddress = _lpTokenAddress;
         swapToken = ITRC20(swapTokenAddress);
