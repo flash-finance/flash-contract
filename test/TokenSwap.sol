@@ -46,7 +46,10 @@ contract TokenSwap is Ownable, ReentrancyGuard {
         swapToken = ITRC20(_swapToken);
         lpToken = ITokenSwap(_lpToken);
         finance = msg.sender;
-        tradingFee = 10;
+        tradingFee = 5000;
+    }
+
+    function() external payable {
     }
 
     function setTokenAddress(address _swapToken, address _lpToken) public onlyOwner {
@@ -70,25 +73,20 @@ contract TokenSwap is Ownable, ReentrancyGuard {
 
 
     function tokenToTrxSwap(uint256 tokens_sold, uint256 min_trx, address payable userAddress) public  returns (uint256) {
-
         require(!paused, "the contract had been paused");
-        swapToken.safeTransfer(address(this), tokens_sold);
-
+        swapToken.safeTransferFrom(msg.sender, address(this), tokens_sold);
         uint256 _value = swapToken.allowance(address(this), address(lpToken));
         if (_value < tokens_sold) {
             swapToken.safeApprove(address(lpToken), uint256(-1));
         }
-
         return tokenToTrx(tokens_sold, min_trx, userAddress);
     }
 
     function tokenToTrx(uint256 tokens_sold, uint256 min_trx, address payable userAddress) private nonReentrant returns (uint256) {
-
         uint256 _value = lpToken.tokenToTrxTransferInput(tokens_sold, min_trx, block.timestamp.add(1800), address(this));
         if (_value == 0) {
             return 0;
         }
-
         uint256 _a = _value.mul(tradingFee).div(10000);
         uint _b = _value.sub(_a);
         if (_b > 0) {
@@ -97,37 +95,33 @@ contract TokenSwap is Ownable, ReentrancyGuard {
         if (_a > 0) {
             address(finance).transfer(_a);
         }
-
         return _b;
     }
 
     function tokenToTokenSwap(uint256 tokens_sold, uint256 min_tokens_bought, uint256 min_trx_bought, address userAddress, address token_addr) public returns (uint256) {
-
         require(!paused, "the contract had been paused");
-        swapToken.safeTransfer(address(this), tokens_sold);
+        swapToken.safeTransferFrom(msg.sender, address(this), tokens_sold);
 
         uint256 _value = swapToken.allowance(address(this), address(lpToken));
         if (_value < tokens_sold) {
-            swapToken.safeApprove(address(lpToken), uint256(- 1));
+            swapToken.safeApprove(address(lpToken), uint256(-1));
         }
 
         return tokenToToken(tokens_sold, min_tokens_bought, min_trx_bought, userAddress, token_addr);
     }
 
     function tokenToToken(uint256 tokens_sold, uint256 min_tokens_bought, uint256 min_trx_bought, address userAddress, address token_addr) private nonReentrant  returns (uint256) {
-
         uint256 _value = lpToken.tokenToTokenTransferInput(tokens_sold, min_tokens_bought, min_trx_bought, block.timestamp.add(1800), address(this), token_addr);
         if (_value == 0) {
             return 0;
         }
-
         uint256 _a = _value.mul(tradingFee).div(10000);
         uint _b = _value.sub(_a);
         if (_b > 0) {
-            ITRC20(token_addr).safeTransfer(userAddress, _b);
+            ITRC20(token_addr).transfer(userAddress, _b);
         }
         if (_a > 0) {
-            ITRC20(token_addr).safeTransfer(finance, _a);
+            ITRC20(token_addr).transfer(finance, _a);
         }
 
         return _b;
