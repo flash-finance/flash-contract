@@ -4,7 +4,7 @@ pragma solidity ^0.5.8;
 import "./Common.sol";
 
 
-interface IJustSwap {
+interface ITokenSwap {
 
     function tokenToTrxTransferInput(
         uint256 tokens_sold,
@@ -31,13 +31,10 @@ contract TokenSwap is Ownable, ReentrancyGuard {
     address public swapTokenAddress;
     address public lpTokenAddress;
     ITRC20 public swapToken;
-    IJustSwap public lpToken;
+    ITokenSwap public lpToken;
     address payable public finance;
     uint256 public tradingFee;
-
     bool public paused = false;
-
-
 
     function pause() external onlyOwner  {
         paused = true;
@@ -51,7 +48,7 @@ contract TokenSwap is Ownable, ReentrancyGuard {
         swapTokenAddress = _swapTokenAddress;
         lpTokenAddress = _lpTokenAddress;
         swapToken = ITRC20(swapTokenAddress);
-        lpToken = IJustSwap(lpTokenAddress);
+        lpToken = ITokenSwap(lpTokenAddress);
         finance = msg.sender;
         tradingFee = 10;
     }
@@ -60,7 +57,7 @@ contract TokenSwap is Ownable, ReentrancyGuard {
         swapTokenAddress = _swapTokenAddress;
         lpTokenAddress = _lpTokenAddress;
         swapToken = ITRC20(swapTokenAddress);
-        lpToken = IJustSwap(lpTokenAddress);
+        lpToken = ITokenSwap(lpTokenAddress);
     }
 
     function setFinanceAddress(address payable _financeAddress) public onlyOwner returns(bool) {
@@ -73,7 +70,7 @@ contract TokenSwap is Ownable, ReentrancyGuard {
         return true;
     }
 
-    function getBaseInfo() public view returns (address, address, address, uint256) {
+    function getBaseInfo() public view returns (address, address, address payable, uint256) {
         return (swapTokenAddress, lpTokenAddress, finance, tradingFee);
     }
 
