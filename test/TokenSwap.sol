@@ -76,7 +76,7 @@ contract TokenSwap is Ownable, ReentrancyGuard {
 
         uint256 _value = swapToken.allowance(address(this), address(lpToken));
         if (_value < tokens_sold) {
-            wapToken.safeApprove(address(lpToken), uint256(-1));
+            swapToken.safeApprove(address(lpToken), uint256(-1));
         }
 
         return tokenToTrx(tokens_sold, min_trx, userAddress);
