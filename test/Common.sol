@@ -268,12 +268,10 @@ library SafeTRC20 {
     function callOptionalReturn(ITRC20 token, bytes memory data) private {
         require(address(token).isContract(), "SafeTRC20: call to non-contract");
 
-        // solhint-disable-next-line avoid-low-level-calls
         (bool success, bytes memory returndata) = address(token).call(data);
         require(success, "SafeTRC20: low-level call failed");
 
-        if (returndata.length > 0) { // Return data is optional
-            // solhint-disable-next-line max-line-length
+        if (returndata.length > 0) {
             require(abi.decode(returndata, (bool)), "SafeTRC20: TRC20 operation did not succeed");
         }
     }
