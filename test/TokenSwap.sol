@@ -22,6 +22,12 @@ interface ITokenSwap {
         address recipient,
         address token_addr)
     external returns (uint256);
+
+    function trxToTokenTransferInput(
+        uint256 min_tokens,
+        uint256 deadline,
+        address recipient)
+    external payable returns(uint256);
 }
 
 contract TokenSwap is Ownable, ReentrancyGuard {
@@ -52,17 +58,17 @@ contract TokenSwap is Ownable, ReentrancyGuard {
     function() external payable {
     }
 
-    function setTokenAddress(address _swapToken, address _lpToken) public onlyOwner {
+    function setTokenAddress(address _swapToken, address _lpToken) external onlyOwner {
         swapToken = ITRC20(_swapToken);
         lpToken = ITokenSwap(_lpToken);
     }
 
-    function setFinanceAddress(address payable _financeAddress) public onlyOwner returns(bool) {
+    function setFinanceAddress(address payable _financeAddress) external onlyOwner returns(bool) {
         finance = _financeAddress;
         return true;
     }
 
-    function setTradingFee(uint256 _value) public onlyOwner returns(bool) {
+    function setTradingFee(uint256 _value) external onlyOwner returns(bool) {
         tradingFee = _value;
         return true;
     }
@@ -72,8 +78,9 @@ contract TokenSwap is Ownable, ReentrancyGuard {
     }
 
 
-    function tokenToTrxSwap(uint256 tokens_sold, uint256 min_trx, address payable userAddress) public  returns (uint256) {
+    function tokenToTrxSwap(uint256 tokens_sold, uint256 min_trx, address payable userAddress) external returns (uint256) {
         require(!paused, "the contract had been paused");
+        require(tokens_sold > 0);
         swapToken.safeTransferFrom(msg.sender, address(this), tokens_sold);
         uint256 _value = swapToken.allowance(address(this), address(lpToken));
         if (_value < tokens_sold) {
@@ -98,8 +105,9 @@ contract TokenSwap is Ownable, ReentrancyGuard {
         return _b;
     }
 
-    function tokenToTokenSwap(uint256 tokens_sold, uint256 min_tokens_bought, uint256 min_trx_bought, address userAddress, address token_addr) public returns (uint256) {
+    function tokenToTokenSwap(uint256 tokens_sold, uint256 min_tokens_bought, uint256 min_trx_bought, address userAddress, address token_addr) external returns (uint256) {
         require(!paused, "the contract had been paused");
+        require(tokens_sold > 0);
         swapToken.safeTransferFrom(msg.sender, address(this), tokens_sold);
 
         uint256 _value = swapToken.allowance(address(this), address(lpToken));
@@ -127,5 +135,27 @@ contract TokenSwap is Ownable, ReentrancyGuard {
         return _b;
     }
 
+
+    function trxToTokenSwap(uint256 min_tokens, address userAddress) external payable returns (uint256) {
+        require(!paused, "the contract had been paused");
+        require(msg.value > 0);
+        return trxToToken(msg.value, min_tokens, userAddress);
+    }
+
+    function trxToToken(uint256 trx_amounts, uint256 min_tokens, address userAddress) private nonReentrant returns (uint256) {
+        uint256 _value = lpToken.trxToTokenTransferInput.value(trx_amounts)(min_tokens, block.timestamp.add(1800), address(this));
+        if (_value == 0) {
+            return 0;
+        }
+        uint256 _a = _value.mul(tradingFee).div(10000);
+        uint _b = _value.sub(_a);
+        if (_b > 0) {
+            swapToken.transfer(userAddress, _b);
+        }
+        if (_a > 0) {
+            swapToken.transfer(finance, _a);
+        }
+        return _b;
+    }
 
 }
