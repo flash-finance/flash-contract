@@ -109,6 +109,7 @@ contract AllTokenSwap is Ownable, ReentrancyGuard {
     function tokenToTokenSwap(address swapToken, address lpToken, uint256 tokensSold, uint256 minTokensBought, uint256 minTrxBought, address userAddress, address targetToken) external returns (uint256) {
         require(!paused, "the contract had been paused");
         require(swapToken == ITokenSwap(lpToken).tokenAddress(), "swapToken and lpToken not matched");
+        require(swapToken != targetToken, "swapToken not equal targetToken");
         require(tokensSold > 0 && minTokensBought > 0 && minTrxBought > 0);
 
         ITRC20(swapToken).safeTransferFrom(msg.sender, address(this), tokensSold);
