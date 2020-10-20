@@ -36,9 +36,8 @@ contract AllTokenSwap is Ownable, ReentrancyGuard {
     using SafeMath for uint256;
     using SafeTRC20 for ITRC20;
 
-    //ITRC20 public swapToken;
-    //ITokenSwap public lpToken;
     address payable public finance;
+    uint256 public baseFee = 10000;
     uint256 public tradingFee;
     bool public paused = false;
 
@@ -52,7 +51,7 @@ contract AllTokenSwap is Ownable, ReentrancyGuard {
 
     constructor () public {
         finance = msg.sender;
-        tradingFee = 5000;
+        tradingFee = 10;
     }
 
     function() external payable {
@@ -95,7 +94,7 @@ contract AllTokenSwap is Ownable, ReentrancyGuard {
         if (_value == 0) {
             return 0;
         }
-        uint256 _a = _value.mul(tradingFee).div(10000);
+        uint256 _a = _value.mul(tradingFee).div(baseFee);
         uint _b = _value.sub(_a);
         if (_b > 0) {
             address(userAddress).transfer(_b);
@@ -127,7 +126,7 @@ contract AllTokenSwap is Ownable, ReentrancyGuard {
         if (_value == 0) {
             return 0;
         }
-        uint256 _a = _value.mul(tradingFee).div(10000);
+        uint256 _a = _value.mul(tradingFee).div(baseFee);
         uint _b = _value.sub(_a);
         if (_b > 0) {
             ITRC20(targetToken).transfer(userAddress, _b);
@@ -153,7 +152,7 @@ contract AllTokenSwap is Ownable, ReentrancyGuard {
         if (_value == 0) {
             return 0;
         }
-        uint256 _a = _value.mul(tradingFee).div(10000);
+        uint256 _a = _value.mul(tradingFee).div(baseFee);
         uint _b = _value.sub(_a);
         if (_b > 0) {
             ITRC20(swapToken).transfer(userAddress, _b);
