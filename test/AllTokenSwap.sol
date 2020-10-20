@@ -106,4 +106,19 @@ contract AllTokenSwap is Ownable, ReentrancyGuard {
     }
 
 
+    function rescueTrx(address payable toAddress, uint256 amount) external onlyOwner returns(bool) {
+        require(toAddress != address(0) && amount> 0);
+        address(toAddress).transfer(amount);
+        return true;
+    }
+
+    function rescueToken(address toAddress, address token, uint256 amount) external onlyOwner returns(bool) {
+        require(toAddress != address(0) && token != address(0) && amount > 0);
+        ITRC20(token).transfer(toAddress, amount);
+        return true;
+    }
+
+
+
+
 }
