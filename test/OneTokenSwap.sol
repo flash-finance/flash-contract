@@ -30,7 +30,7 @@ interface ITokenSwap {
     external payable returns(uint256);
 }
 
-contract TokenSwap is Ownable, ReentrancyGuard {
+contract OneTokenSwap is Ownable, ReentrancyGuard {
     using SafeMath for uint256;
     using SafeTRC20 for ITRC20;
 
