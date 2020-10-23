@@ -170,6 +170,11 @@ contract FlashSwap is Ownable, ReentrancyGuard {
         return _b;
     }
 
+    function getBalanceOfTrx(address user) public view returns(uint256) {
+        require(user != address(0));
+        return address(user).balance;
+    }
+
     function getBalanceOfToken(address token, address user) public view returns(uint256) {
         require(token != address(0) && user != address(0));
         return ITRC20(token).balanceOf(user);
