@@ -30,9 +30,15 @@ interface ITokenSwap {
     external payable returns(uint256);
 
     function tokenAddress() external view returns (address);
+
+    function getTrxToTokenInputPrice(uint256 trx_sold)
+    external view returns (uint256);
+
+    function getTokenToTrxInputPrice(uint256 tokens_sold)
+    external view returns (uint256);
 }
 
-contract AllTokenSwap is Ownable, ReentrancyGuard {
+contract FlashSwap is Ownable, ReentrancyGuard {
     using SafeMath for uint256;
     using SafeTRC20 for ITRC20;
 
@@ -164,6 +170,26 @@ contract AllTokenSwap is Ownable, ReentrancyGuard {
         return _b;
     }
 
+    function getBalanceOfToken(address token, address user) public view returns(uint256) {
+        require(token != address(0) && user != address(0));
+        return ITRC20(token).balanceOf(user);
+    }
+
+    function getTrxToTokenPrice(address lpToken, uint256 trxAmount) public view returns(uint256) {
+        require(lpToken != address(0) && trxAmount > 0);
+        return ITokenSwap(lpToken).getTrxToTokenInputPrice(trxAmount);
+    }
+
+    function getTokenToTrxPrice(address lpToken, uint256 tokenAmount) public view returns(uint256) {
+        require(lpToken != address(0) && tokenAmount > 0);
+        return ITokenSwap(lpToken).getTokenToTrxInputPrice(tokenAmount);
+    }
+
+    function getTokenToTokenPrice(address sourceLpToken, address targetLpToken, uint256 sourceTokenAmount) public view returns(uint256) {
+        require(sourceLpToken != address(0) && targetLpToken != address(0) && sourceTokenAmount > 0);
+        uint256 _trxValue = ITokenSwap(sourceLpToken).getTokenToTrxInputPrice(sourceTokenAmount);
+        return ITokenSwap(targetLpToken).getTrxToTokenInputPrice(_trxValue);
+    }
 
     function rescueTrx(address payable toAddress, uint256 amount) external onlyOwner returns(bool) {
         require(toAddress != address(0) && amount> 0);
